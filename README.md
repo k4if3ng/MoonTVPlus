@@ -285,6 +285,44 @@ services:
       - UPSTASH_TOKEN=上面的 TOKEN
 ```
 
+#### Lite 镜像说明
+
+`ghcr.io/mtvpls/moontvplus-lite:latest` 为更小的镜像，但不支持启动内置观影室服务。
+
+示例：
+
+```yml
+services:
+  moontv-core:
+    image: ghcr.io/mtvpls/moontvplus-lite:latest
+    container_name: moontv-core
+    restart: on-failure
+    ports:
+      - '3000:3000'
+    environment:
+      - USERNAME=admin
+      - PASSWORD=admin_password
+      - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
+      - KVROCKS_URL=redis://moontv-kvrocks:6666
+    networks:
+      - moontv-network
+    depends_on:
+      - moontv-kvrocks
+  moontv-kvrocks:
+    image: apache/kvrocks
+    container_name: moontv-kvrocks
+    restart: unless-stopped
+    volumes:
+      - kvrocks-data:/var/lib/kvrocks/data
+    networks:
+      - moontv-network
+networks:
+  moontv-network:
+    driver: bridge
+volumes:
+  kvrocks-data:
+```
+
 ## 配置文件
 
 完成部署后为空壳应用，无播放源，需要站长在管理后台的配置文件设置中填写配置文件，本版本已不支持无数据库运行。
